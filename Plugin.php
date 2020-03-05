@@ -4,7 +4,7 @@
  * 
  * @package APlayerAtBottom
  * @author 小太
- * @version 1.0.0
+ * @version 1.0.1
  * @link https://713.moe/
  */
 class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
@@ -18,7 +18,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
      */
     public static function activate(){
         Typecho_Plugin::factory('Widget_Archive')->footer = array('APlayerAtBottom_Plugin', 'footer');
-        Typecho_Plugin::factory('Widget_Archive') ->header = array('APlayerAtBottom_Plugin', 'header');
+        Typecho_Plugin::factory('Widget_Archive')->header = array('APlayerAtBottom_Plugin', 'header');
     	return'启用成功ヾ(≧▽≦*)o，请设置您您的歌单ID~';
     }
     /**
@@ -41,8 +41,8 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
      * @return void
      */
     public static function config(Typecho_Widget_Helper_Form $form){
-    	$id = new Typecho_Widget_Helper_Form_Element_Text('id', null, '2105681544', _t('歌单id'), '这里填写你的 <b>网易云音乐</b> 歌单id（目前仅支持网易云音乐）');
-        $form->addInput($id);
+    	$id = new Typecho_Widget_Helper_Form_Element_Text('id', null, '2105681544', _t('歌单id'), '这里填写你的 <b>网易云音乐</b> 歌单id（目前仅支持网易云音乐）<br/>PS：更换后请刷新浏览器缓存！');
+        $form->addInput($id);br/
       	$autoplay = new Typecho_Widget_Helper_Form_Element_Text('autoplay', null, 'false', _t('自动播放'), '填写true则打开页面后自动播放，填写false则打开页面后不自动播放<br/>PS：部分主题或浏览器可能不支持此项。');
         $form->addInput($autoplay);
         $theme = new Typecho_Widget_Helper_Form_Element_Text('theme', null, '#3498db', _t('主题颜色'), '这里填写十六进制颜色代码，作为进度条和音量条的主题颜色');
@@ -71,9 +71,8 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
     public static function render(){}
     public static function header(){
     	echo '<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.css">';
-    }
-    public static function footer(){
-     $config = Typecho_Widget::widget('Widget_Options')->plugin('APlayerAtBottom');
+      	
+      	$config = Typecho_Widget::widget('Widget_Options')->plugin('APlayerAtBottom');
         $id = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> id;
      	$autoplay = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> autoplay;
       	$theme = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> theme;
@@ -85,25 +84,25 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
         }else{
         	$lrc_out = 0;
         }
-      	
-        echo '<div id="downplayer"></div>
-        	<script src="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.js"></script>
-			<script type="text/javascript">
-              $(function(){
-                  $.get("https://api.i-meto.com/meting/api?server=netease&type=playlist&id='.$id.'", function(result){
-                      var audio = $.parseJSON(result);
-                      const ap = new APlayer({
-                          container: document.getElementById(\'downplayer\'),
-                          lrcType: '.$lrc_out.',
-                          autoplay: '.$autoplay.',
-                          fixed: true,
-                          theme: \''.$theme.'\',
-                          volume: '.$volume.',
-                          audio: audio
-                      });
-                  });
-              });
-          </script>';
+      
+      	$apiget = file_get_contents("https://api.i-meto.com/meting/api?server=netease&type=playlist&id=".$id."");
+        $write = "const ap = new APlayer({
+    				container: document.getElementById('downplayer'),
+                        lrcType: ".$lrc_out.",
+                        autoplay: ".$autoplay.",
+                        fixed: true,
+                        theme: '".$theme."',
+                        volume: ".$volume.",
+    					audio: ".$apiget."
+				  });";
+      	$myfile = fopen("./usr/plugins/APlayerAtBottom/downplayer.js", "w") or die("Unable to open file!");//打开文件
+		fwrite($myfile, $write);//写入文件
+		fclose($myfile);//关闭文件
+    }
+    public static function footer(){
+        echo '<div id="downplayer"></div>';
+        echo '<script src="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.js"></script>';
+		echo '<script src="./usr/plugins/APlayerAtBottom/downplayer.js"></script>';
     }
 }
 ?>
