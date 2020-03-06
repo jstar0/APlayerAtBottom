@@ -148,7 +148,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
         	echo '<script src="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.js"></script>'; //输出APlayerJS
         }else{}
         
-		echo '<script src="./usr/plugins/APlayerAtBottom/downplayer.js"></script>'; //输出设定内容JS
+		echo '<script src="/usr/plugins/APlayerAtBottom/downplayer.js"></script>'; //输出设定内容JS
     }
 }
 ?>
