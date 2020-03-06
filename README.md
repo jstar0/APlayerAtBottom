@@ -9,6 +9,8 @@
 
 ---
 
+## 注意，请不要删除downplayer.js！！！
+
 ## 特色
  - 支持直接解析网易云音乐歌单（[MetingJS](https://github.com/metowolf/MetingJS)）
  - 支持自定义播放器主题颜色（作为进度条和音量条的主题颜色）
@@ -28,8 +30,8 @@
  - [MetingJS](https://github.com/metowolf/MetingJS)（解析网易云音乐歌单歌曲）
 
 ## 相关
-演示站点：[我的博客](https://713.moe/)
-介绍文章：[APlayerAtBottom - 给博客加上底部播放器吧](https://713.moe/p/135)
+ - 演示站点：[我的博客](https://713.moe/)
+ - 介绍文章：[APlayerAtBottom - 给博客加上底部播放器吧](https://713.moe/p/135)
 
 ---
 
