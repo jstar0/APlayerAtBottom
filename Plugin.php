@@ -4,7 +4,7 @@
  * 
  * @package APlayerAtBottom
  * @author 小太
- * @version 1.0.1
+ * @version 1.0.2
  * @link https://713.moe/
  */
 class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
@@ -19,7 +19,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
     public static function activate(){
         Typecho_Plugin::factory('Widget_Archive')->footer = array('APlayerAtBottom_Plugin', 'footer');
         Typecho_Plugin::factory('Widget_Archive')->header = array('APlayerAtBottom_Plugin', 'header');
-    	return'启用成功ヾ(≧▽≦*)o，请设置您您的歌单ID~';
+    	return '启用成功ヾ(≧▽≦*)o，请设置您您的歌单ID~';
     }
     /**
      * 禁用插件方法,如果禁用失败,直接抛出异常
@@ -30,7 +30,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
      * @throws Typecho_Plugin_Exception
      */
     public static function deactivate(){
-    	return'禁用成功！插件已经停用啦（；´д｀）ゞ';
+    	return '禁用成功！插件已经停用啦（；´д｀）ゞ';
     }
 
     /**
@@ -41,16 +41,37 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
      * @return void
      */
     public static function config(Typecho_Widget_Helper_Form $form){
+      	$version = '1.0.2'; //定义此插件版本
+      	// $api_get = file_get_contents('https://api.github.com/repos/satosouta/APlayerAtBottom/releases/latest'); //使用GithubAPI获取最后发布内容
+      	// $arr = json_decode($api_get, true); //json解析
+      	// $new_version = $arr[0]['tag_name']; //获取版本号
+      	$new_version = file_get_contents('https://api.713.moe/version/aab.json'); //因为GithubAPI部分网络无法使用更换获取版本号方式
+      	
+      	//判断版本是否过时
+      	if($version < $new_version) {
+        	$version_tips = '该插件有<font color="#e84118">新版本</font> => <a href="https://github.com/SatoSouta/APlayerAtBottom/releases/tag/'.$new_version.'" target="_blank">立即下载</a>';
+          	$new_version_out = '<font color="#e84118">'.$new_version.'</font>';
+        }else{
+        	$version_tips = '您的插件为最新版本，无需更新！';
+          	$new_version_out = $new_version;
+        }
+      	
+      	//输出版本信息
+        $public_section = new Typecho_Widget_Helper_Layout('div', array('class=' => 'typecho-page-title'));
+        $public_section->html('<h4>本插件目前版本：'.$version.' | 最新版本：'.$new_version_out.'（'.$version_tips.'）</h4><h4><font color="#e84118">请注意：保存配置后刷新浏览器缓存后方可更新播放器内容</font></h4>');
+        $form->addItem($public_section);
+      	
+      	//设置内容
     	$id = new Typecho_Widget_Helper_Form_Element_Text('id', null, '2105681544', _t('歌单id'), '这里填写你的 <b>网易云音乐</b> 歌单id（目前仅支持网易云音乐）<br/>PS：更换后请刷新浏览器缓存！');
-        $form->addInput($id);br/
-      	$autoplay = new Typecho_Widget_Helper_Form_Element_Text('autoplay', null, 'false', _t('自动播放'), '填写true则打开页面后自动播放，填写false则打开页面后不自动播放<br/>PS：部分主题或浏览器可能不支持此项。');
-        $form->addInput($autoplay);
+        $form->addInput($id);
+      	$autoplay = new Typecho_Widget_Helper_Form_Element_Radio('autoplay', array ('0' => '启用', '1' => '禁用'), '1','自动播放', 'PS：部分主题或浏览器可能不支持此项。');
+    	$form->addInput($autoplay);
+      	$lrc = new Typecho_Widget_Helper_Form_Element_Radio('lrc', array ('0' => '启用', '1' => '禁用'), '0','歌词显示', '选择是否开启歌词显示');
+    	$form->addInput($lrc);
         $theme = new Typecho_Widget_Helper_Form_Element_Text('theme', null, '#3498db', _t('主题颜色'), '这里填写十六进制颜色代码，作为进度条和音量条的主题颜色');
         $form->addInput($theme);
         $volume = new Typecho_Widget_Helper_Form_Element_Text('volume', null, '0.7', _t('默认音量'), '这里填写不大于1的数字作为默认音量<br/>PS：播放器会记忆用户设置，用户手动设置音量后默认音量即失效');
         $form->addInput($volume);
-      	$lrc = new Typecho_Widget_Helper_Form_Element_Text('lrc', null, 'true', _t('是否开启歌词'), '填写true则开启歌词，填写false则关闭歌词');
-        $form->addInput($lrc);
     }
 
     /**
@@ -70,39 +91,48 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
      */
     public static function render(){}
     public static function header(){
-    	echo '<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.css">';
+    	echo '<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.css">'; //输出APlayerCSS
       	
+      	//获取参数
       	$config = Typecho_Widget::widget('Widget_Options')->plugin('APlayerAtBottom');
         $id = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> id;
      	$autoplay = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> autoplay;
       	$theme = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> theme;
       	$volume = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> volume;
       	$lrc = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> lrc;
-      
-      	if($lrc === 'true') {
+      	
+      	//判断是否打开歌词
+      	if($lrc === '0') {
         	$lrc_out = 3;
         }else{
         	$lrc_out = 0;
         }
+      	//判断是否打开自动播放
+      	if($autoplay === '0') {
+          	$autoplay_out = 'true';
+        }else{
+        	$autoplay_out = 'false';
+        }
       
-      	$apiget = file_get_contents("https://api.i-meto.com/meting/api?server=netease&type=playlist&id=".$id."");
+      	$apiget = file_get_contents("https://api.i-meto.com/meting/api?server=netease&type=playlist&id=".$id.""); //使用MetoAPI获取歌单内容
+      	//将歌单内容与设定写入APlayer参数
         $write = "const ap = new APlayer({
     				container: document.getElementById('downplayer'),
                         lrcType: ".$lrc_out.",
-                        autoplay: ".$autoplay.",
+                        autoplay: ".$autoplay_out.",
                         fixed: true,
                         theme: '".$theme."',
                         volume: ".$volume.",
     					audio: ".$apiget."
 				  });";
-      	$myfile = fopen("./usr/plugins/APlayerAtBottom/downplayer.js", "w") or die("Unable to open file!");//打开文件
-		fwrite($myfile, $write);//写入文件
-		fclose($myfile);//关闭文件
+      	$myfile = fopen("./usr/plugins/APlayerAtBottom/downplayer.js", "w") or die("Unable to open file!"); //打开downplayer.js文件
+		fwrite($myfile, $write); //将APlayerJS参数设定写入downplayer.js
+		fclose($myfile); //写入完成
     }
     public static function footer(){
-        echo '<div id="downplayer"></div>';
-        echo '<script src="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.js"></script>';
-		echo '<script src="./usr/plugins/APlayerAtBottom/downplayer.js"></script>';
+        echo '<div id="downplayer"></div>'; //构建播放器
+        echo '<script src="//cdn.jsdelivr.net/npm/aplayer@1.10.0/dist/APlayer.min.js"></script>'; //输出APlayerJS
+		echo '<script src="./usr/plugins/APlayerAtBottom/downplayer.js"></script>'; //输出设定内容JS
     }
 }
 ?>
