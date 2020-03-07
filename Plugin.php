@@ -4,7 +4,7 @@
  * 
  * @package APlayerAtBottom
  * @author 小太
- * @version 1.0.3
+ * @version 1.0.4
  * @link https://713.moe/
  */
 class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
@@ -41,7 +41,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
      * @return void
      */
     public static function config(Typecho_Widget_Helper_Form $form){
-      	$version = '1.0.3'; //定义此插件版本
+      	$version = '1.0.4'; //定义此插件版本
       	$api_get = file_get_contents('https://api.713.moe/version/aab_gh.json'); //获取最新版本内容（GithubAPI部分地区无法访问就没用了）
       	$arr = json_decode($api_get, true); //json解析
       	$new_version = $arr['tag_name']; //获取版本号
@@ -52,8 +52,13 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
         	$version_tips = '该插件有<font color="#e84118">新版本</font> => '.$new_title.' => <a href="https://github.com/SatoSouta/APlayerAtBottom/releases/tag/'.$new_version.'" target="_blank">立即下载</a>';
           	$new_version_out = '<font color="#e84118">'.$new_version.'</font>';
         }else{
-        	$version_tips = '您的插件为最新版本，无需更新！';
-          	$new_version_out = $new_version;
+          	if($version > $new_version){
+            	$version_tips = '你怎么回事，怎么还比最新版本高了？';
+          		$new_version_out = '<font color="#e84118">'.$new_version.'</font>';
+            }else{
+        		$version_tips = '您的插件为最新版本，无需更新！';
+          		$new_version_out = $new_version;
+            }
         }
       	
       	//输出版本信息
@@ -70,6 +75,8 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
     	$form->addInput($autoplay);
       	$lrc = new Typecho_Widget_Helper_Form_Element_Radio('lrc', array ('0' => '启用', '1' => '禁用'), '0','歌词显示', '选择是否开启歌词显示');
     	$form->addInput($lrc);
+     	$order = new Typecho_Widget_Helper_Form_Element_Radio('order', array ('0' => '列表顺序', '1' => '随机播放'), '0','音频循环顺序', '选择你的音乐播放方式~');
+    	$form->addInput($order);
         $theme = new Typecho_Widget_Helper_Form_Element_Text('theme', null, '#3498db', _t('主题颜色'), '这里填写十六进制颜色代码，作为进度条和音量条的主题颜色');
         $form->addInput($theme);
         $volume = new Typecho_Widget_Helper_Form_Element_Text('volume', null, '0.7', _t('默认音量'), '这里填写不大于1的数字作为默认音量<br/>PS：播放器会记忆用户设置，用户手动设置音量后默认音量即失效');
@@ -101,6 +108,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
       	$theme = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> theme;
       	$volume = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> volume;
       	$lrc = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> lrc;
+      	$order = Typecho_Widget::widget('Widget_Options') -> Plugin('APlayerAtBottom') -> order;
       	
       	//判断是否有开启APlayer设置
       	if($aplayer === '1') {
@@ -120,6 +128,13 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
         }else{
         	$autoplay_out = 'false';
         }
+      	
+      	//判断歌曲播放方式
+      	if($order === '0') {
+        	$order_out = 'list';
+        }else{
+        	$order_out = 'random';
+        }
       
       	$apiget = file_get_contents("https://api.i-meto.com/meting/api?server=netease&type=playlist&id=".$id.""); //使用MetoAPI获取歌单内容
       	//将歌单内容与设定写入APlayer参数
@@ -130,6 +145,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
                         fixed: true,
                         theme: '".$theme."',
                         volume: ".$volume.",
+                        order: '".$order_out."',
     					audio: ".$apiget."
 				  });";
       	$myfile = fopen("./usr/plugins/APlayerAtBottom/downplayer.js", "w") or die("Unable to open file!"); //打开downplayer.js文件
