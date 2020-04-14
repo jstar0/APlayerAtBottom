@@ -10,7 +10,7 @@
 ---
 
 ## 特色
- - 支持直接解析网易云音乐歌单（默认提供：[O's API](https://api.ohmyga.cn/page/netease)）
+ - 支持直接解析网易云音乐歌单（默认提供：[Shota's API](https://api.713.moe/page/netease)）
  - 支持自定义播放器主题颜色（作为进度条和音量条的主题颜色）
  - 支持开启自动播放（仅部分浏览器支持）
  - 支持设定默认音量（播放器会记忆用户设置，用户手动设置音量后默认音量即失效）
@@ -30,6 +30,7 @@
 
 ## API支持
  - [O's API](https://api.ohmyga.cn/page/netease)（O's API 网易云音乐解析）
+ - [Shota's API](https://api.713.moe/page/netease)（Shota's API 网易云音乐解析）
 
 ## 相关
  - 演示站点：[我的博客](https://713.moe/)
