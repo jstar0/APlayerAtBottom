@@ -169,7 +169,7 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
 		if($api === '0'){
 			$api_out = 'https://api.ohmyga.cn/netease/?use=1&type=playlist&id=';
 		}elseif($api === '1'){
-        	$api_out = 'https://api.713.moe/netease/?type=playlist&id=';
+        	$api_out = 'https://api.9jojo.cn/netease/?type=playlist&id=';
         }elseif($api === '2'){
 			$api_out = $iapi;
 		}
