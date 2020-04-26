@@ -18,11 +18,12 @@
  - 支持修改网易云音乐获取API（Ver.1.1.0+）
 
 ## 使用
-1. 下载**最新的 [Release](https://github.com/SatoSouta/APlayerAtBottom/releases/latest)**
-2. 解压后，**确认目录名为`APlayerAtBottom`（AP,A,B 大写）**
-3. 将文件夹放入 Typecho 根目录下的`usr/plugins/`
-4. 到后台启用插件
-5. 根据设置中提示来设定插件
+1. Star本项目
+2. 下载**最新的 [Release](https://github.com/SatoSouta/APlayerAtBottom/releases/latest)**
+3. 解压后，**确认目录名为`APlayerAtBottom`（AP,A,B 大写）**
+4. 将文件夹放入 Typecho 根目录下的`usr/plugins/`
+5. 到后台启用插件
+6. 根据设置中提示来设定插件
 
 ## 开源项目
  - [APlayer](https://github.com/MoePlayer/APlayer)（播放器JS）
@@ -34,7 +35,7 @@
  - [犬's API](https://api.fczbl.vip/163/)（犬's API 网易云音乐解析）
 
 ## 相关
- - 演示站点：[我的博客](https://713.moe/)
+ - 演示站点：[小太の游乐园](https://713.moe/)
  - 介绍文章：[APlayerAtBottom - 给博客加上底部播放器吧](https://713.moe/p/135)
 
 ---
