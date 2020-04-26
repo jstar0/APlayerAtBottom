@@ -99,11 +99,11 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
         $form->addInput($theme);
         $volume = new Typecho_Widget_Helper_Form_Element_Text('volume', null, '0.7', _t('默认音量'), '这里填写不大于1的数字作为默认音量<br/>PS：播放器会记忆用户设置，用户手动设置音量后默认音量即失效');
         $form->addInput($volume);
-		$cachetime = new Typecho_Widget_Helper_Form_Element_Text('cachetime', null, '86400', _t('缓存时间（秒）'), '这里填写自动缓存的时间，默认为24小时');
-		$form->addInput($cachetime);
-		$api = new Typecho_Widget_Helper_Form_Element_Radio('api', array ('0' => 'O\'s API', '1' => 'Shota\'s API', '2' => '自定义API'), '1','网易云音乐歌单解析', '您可以自行选择音乐歌单解析服务器');
+	$cachetime = new Typecho_Widget_Helper_Form_Element_Text('cachetime', null, '86400', _t('缓存时间（秒）'), '这里填写自动缓存的时间，默认为24小时');
+	$form->addInput($cachetime);
+	$api = new Typecho_Widget_Helper_Form_Element_Radio('api', array ('0' => 'O\'s API', '1' => 'Shota\'s API', '2' => '犬\'s API', '3' => '自定义API'), '1','网易云音乐歌单解析', '您可以自行选择音乐歌单解析服务器');
     	$form->addInput($api);
-		$iapi = new Typecho_Widget_Helper_Form_Element_Text('iapi', null, null, _t('自定义API'), '若您上一个设置选择了自定义API，请您按照下面的方式填写，若没有选择则可以空着<br/>示例：https://api.713.moe/netease?type=playlist&id=');
+	$iapi = new Typecho_Widget_Helper_Form_Element_Text('iapi', null, null, _t('自定义API'), '若您上一个设置选择了自定义API，请您按照下面的方式填写，若没有选择则可以空着<br/>示例：https://api.713.moe/netease?type=playlist&id=');
         $form->addInput($iapi);
     }
 
@@ -165,14 +165,16 @@ class APlayerAtBottom_Plugin implements Typecho_Plugin_Interface
         	$order_out = 'random';
         }
 		
-		//判断设置的API
-		if($api === '0'){
-			$api_out = 'https://api.ohmyga.cn/netease/?use=1&type=playlist&id=';
-		}elseif($api === '1'){
+	//判断设置的API
+	if($api === '0'){
+	        $api_out = 'https://api.ohmyga.cn/netease/?use=1&type=playlist&id=';
+	}elseif($api === '1'){
         	$api_out = 'https://api.9jojo.cn/netease/?type=playlist&id=';
         }elseif($api === '2'){
-			$api_out = $iapi;
-		}
+                $api_out = 'https://api.fczbl.vip/163/?type=playlist&id=';
+        }elseif($api === '3'){
+		$api_out = $iapi;
+	}
 		
 		//更新方法
 		if (file_exists(__DIR__ .'/settings.json') == false) {
